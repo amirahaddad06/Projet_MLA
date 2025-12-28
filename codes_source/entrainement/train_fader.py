@@ -56,13 +56,13 @@ def main():
 
     # --- Fader specific ---
     ap.add_argument("--lambda_lat", type=float, default=1e-4)
-    ap.add_argument("--lambda_warmup", type=int, default=500000)  # ✅ en steps (batches)
+    ap.add_argument("--lambda_warmup", type=int, default=500000)  # en steps (batches)
     ap.add_argument("--n_dis_steps", type=int, default=1)
 
     # --- Monitoring / save ---
     ap.add_argument("--log_every", type=int, default=200)
-    ap.add_argument("--save_every", type=int, default=2000)  # ✅ en steps (batches)
-    ap.add_argument("--ckpt_every", type=int, default=5000)  # ✅ en steps (batches)
+    ap.add_argument("--save_every", type=int, default=2000)  # en steps (batches)
+    ap.add_argument("--ckpt_every", type=int, default=5000)  # en steps (batches)
     ap.add_argument("--tensorboard", action="store_true")
 
     args = ap.parse_args()
@@ -95,7 +95,8 @@ def main():
     # --- Models (mono-attribut => n_attr=1) ---
     encoder = Encoder().to(device)
     decoder = Decoder(n_attr=1).to(device)
-    discriminator = Discriminator(n_attr=1).to(device)
+    discriminator = Discriminator(n_attr=1, dropout=0.3).to(device)
+
 
     # --- Losses ---
     losses = FaderLosses()
@@ -197,13 +198,13 @@ def main():
                     writer.add_scalar("train/lambda", metrics["lambda"], global_step)
                     writer.add_scalar("train/acc_dis", metrics["acc_dis"], global_step)
 
-            # ✅ images monitoring (seuil >=)
+            # images monitoring (seuil >=)
             if global_step >= next_save:
                 out_img = paths.samples / f"monitor_step_{global_step:07d}.png"
                 save_monitor_grid(encoder, decoder, fixed_x, fixed_y, out_img)
                 next_save += args.save_every
 
-            # ✅ checkpoint (seuil >=)
+            # checkpoint (seuil >=)
             if global_step >= next_ckpt:
                 ckpt = {
                     "epoch": epoch,
