@@ -1,18 +1,30 @@
-# Projet_MLA – Fader Networks sur CelebA
+# Projet_MLA — Fader Networks appliqués à CelebA
 
-Ce dépôt contient le pipeline complet du projet **MLA**, depuis le **prétraitement du dataset CelebA** jusqu’au **test des modèles Fader Networks pré-entraînés**.  
-L’objectif est de produire une **baseline qualitative fiable**, qui servira ensuite de référence pour comparer avec notre propre ré-implémentation et entraînement du modèle.
+## Présentation du projet
+
+Ce projet implémente un **pipeline complet de Fader Networks** appliqué au dataset **CelebA**.
+L’objectif est de modifier **des attributs binaires du visage** (genre, lunettes, âge, sourire, etc.)
+tout en conservant l’identité de la personne.
+
+Le dépôt couvre :
+- le **prétraitement** du dataset CelebA,
+- l’**implémentation de l’architecture** des Fader Networks,
+- l’**entraînement** des modèles pour différents attributs,
+- la **génération d’interpolations** et l’analyse qualitative des résultats.
+
+Toutes les commandes doivent être exécutées depuis la racine du projet :
+```bash
+Projet_MLA/
+```
 
 ---
 
-## 1. Installation et environnement
+## 1. Dépendances et installation
 
-### Version de Python recommandée
-- **Python 3.12**
+### 1.1 Python
+- Version recommandée : **Python 3.12**
 
-### Installation des dépendances
-Installer les librairies nécessaires avec :
-
+### 1.2 Installation des dépendances
 ```bash
 pip install torch torchvision pillow numpy tqdm matplotlib
 ```
@@ -21,237 +33,129 @@ pip install torch torchvision pillow numpy tqdm matplotlib
 
 ## 2. Dataset CelebA
 
-### 2.1 Téléchargement
-Le dataset **CelebA** n’est pas fourni dans ce dépôt.  
-Il doit être téléchargé séparément depuis la source officielle.
+Le dataset **CelebA n’est pas inclus dans le dépôt GitHub** en raison de sa taille.
 
-### 2.2 Organisation attendue
-Après téléchargement, placez le dataset dans le dossier racine du projet :
+Lien officiel :
+https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html
 
-```
+Fichiers requis :
+- img_align_celeba.zip
+- list_attr_celeba.txt
+- list_eval_partition
+
+Organisation attendue :
+```text
 Projet_MLA/
 └── CelebA/
     └── CelebA/
         └── images/
-            ├── 000001.jpg
-            ├── 000002.jpg
-            └── ...
-```
-
-Le chemin exact attendu par les scripts est :
-```
-CelebA/CelebA/images/
+        └── Ano 
+        └── Eval  
 ```
 
 ---
 
-## 3. Prétraitement du dataset CelebA
+## 3. Prétraitement
 
-### 3.1 Dossier Data_preprocessed
-
-Après exécution du prétraitement, le dossier suivant est créé :
-
+Commande à lancer depuis la racine :
+```bash
+python preprocess/pretraitement_data.py
 ```
+
+Sorties :
+```text
 Data_preprocessed/
 ├── Images_Preprocessed/
 └── attributes.pth
 ```
 
-### 3.2 Pipeline de prétraitement
+---
 
-Le dossier `preprocess/` contient :
+## 4. Architecture (`codes_source/`)
 
-- `pretraitement_des_images.py`  
-  - crop vertical (20 → 198)  
-  - resize 256×256  
-  - normalisation des images  
+- Encoder.py
+- Decoder.py
+- Discriminator.py
+- loader.py
+- entrainement/
 
-- `pretraitement_des_attributs.py`  
-  - lecture de `list_attr_celeba.txt`  
-  - sélection des attributs Fader  
-  - génération de `attributes.pth`  
+---
 
-- `pretraitement_data.py`  
-  - exécute l’ensemble du pipeline  
-
-### 3.3 Lancer le prétraitement
-Depuis la racine du projet :
+## 5. Entraînement
 
 ```bash
-python preprocess/pretraitement_data.py
+python -m codes_source.entrainement.train_fader --attr  'nom_attribut' --root_dir . --out_dir modeles_entraines --epochs 500 --epoch_size 50000 --batch_size 32 --ckpt_every 5000 --save_every 2000 --log_every 200
 ```
+  
+ 
+---
+
+## 6. Tests & Interpolations
+
+Tests — Modèles entraînés (par l’équipe)
+
+### 7.1 Où sont les modèles ?
+Dans `Modeles_entraines/<attribut>/<attribut>.pth` :
+- `Modeles_entraines\male\male.pth`
+- `Modeles_entraines\eyeglasses\eyeglasses.pth`
+- `Modeles_entraines\smiling\smiling.pth`
+- `Modeles_entraines\young\young.pth`
+
+vous trouverez aussi les logs des entrainements. 
+
+### 7.2 Scripts disponibles
+Dans `test_modeles_entraines/` :
+- `test_trained_models_idx.py` : test sur IDs choisis (`--img_ids`)
+- `test_trained_models_random.py` : test sur images random du split test (`--random_test`)
 
 ---
 
-## 4. Tests des modèles pré-entraînés Fader Networks
+## 8) Commandes — Modèles entraînés
 
-Cette étape permet de tester les modèles Fader officiels sur les données CelebA prétraitées.  
-Elle constitue la **baseline qualitative** du projet.
+> **Important :** vous pouvez choisir **autant d’images que vous voulez**   :  
+> - `--img_ids id1 id2 ...` (idx)  
+> - `--random_test K` (random)
 
----
+### 8.1 Test sur IDs précis (idx)
 
-## 5. Principe des Fader Networks
-
-Un **Fader Network** est un auto-encodeur conditionné par un attribut binaire.
-
-- Encodeur : image → espace latent  
-- Décodeur : latent + attribut → image modifiée  
-
-Attribut binaire :
-- 0 → `[1, 0]`
-- 1 → `[0, 1]`
-
-### Interpolations
-Les interpolations sont définies par :
-
-```
-y(α) = [1 − α , α]
-α ∈ [1 − alpha_min , alpha_max]
-```
-
----
-
-## 6. Scripts de test
-
-### 6.1 test_celebA_one.py
-
-Test sur **une seule image**.
-
-Sorties :
-```
-results/one/<modele>/<img_id>/
-├── before.png
-├── after.png
-├── before_after.png
-├── grid.png
-└── meta.txt
-```
-
-### 6.2 test_celebA_grid5.py
-
-Test sur **cinq images fixes**.
-
-Sorties :
-```
-results/grid5/<modele>/<ids>/
-├── before_after.png
-├── interpolations.png
-└── meta.txt
-```
-
----
-
-## 7. Commandes d’exemple
-
-### Test ONE
+#### Male (3 images)
 ```powershell
-python .\tests_pretrained\test_celebA_one.py --model_pth .\models_pre_entraines\eyeglasses.pth --img_id 182638 --alpha_min 2.0 --alpha_max 2.0 --n_interpolations 10
-
+python .\test_modeles_entraines\test_trained_models_idx.py --model_pth .\Modeles_entraines\male\male.pth --attr_name Male --img_ids 202524 202576 202595 --alpha_min 2 --alpha_max 2 --n_interpolations 10
 ```
 
+#### Eyeglasses (5 images)
 ```powershell
-python .\tests_pretrained\test_celebA_one.py --model_pth .\models_pre_entraines\young.pth --img_id 182638 --alpha_min 10.0 --alpha_max 10.0 --n_interpolations 10
-
+python .\test_modeles_entraines\test_trained_models_idx.py --model_pth .\Modeles_entraines\eyeglasses\eyeglasses.pth --attr_name Eyeglasses --img_ids 202577 202583 202595 202505 202567 --alpha_min 2 --alpha_max 2 --n_interpolations 10
 ```
+
+#### Young (gain fort, exemple alpha=10)
 ```powershell
-python .\tests_pretrained\test_celebA_one.py --model_pth .\models_pre_entraines\male.pth --img_id 182638 --alpha_min 10.0 --alpha_max 10.0 --n_interpolations 10
-
-
+python .\test_modeles_entraines\test_trained_models_idx.py --model_pth .\Modeles_entraines\young\young.pth --attr_name Young --img_ids 202577 202583 202595 202505 202567 --alpha_min 10 --alpha_max 10 --n_interpolations 10
 ```
 
-### Test GRID5
+### 8.2 Test random (K images du split test)
+
+#### Male (K=5) par exemple 
 ```powershell
-python .\tests_pretrained\test_celebA_grid5.py --model_pth .\models_pre_entraines\eyeglasses.pth --img_ids 182638 190012 195555 200001 202599 --alpha_min 2.0 --alpha_max 2.0 --n_interpolations 12
-
+python .\test_modeles_entraines\test_trained_models_random.py --model_pth .\Modeles_entraines\male\male.pth --attr_name Male --random_test 5 --seed 0 --alpha_min 2 --alpha_max 2 --n_interpolations 10
 ```
 
+#### Smiling (K=8)
 ```powershell
-python .\tests_pretrained\test_celebA_grid5.py --model_pth .\models_pre_entraines\male.pth --img_ids 182638 190012 195555 200001 202599 --alpha_min 2.0 --alpha_max 2.0 --n_interpolations 10
-
+python .\test_modeles_entraines\test_trained_models_random.py --model_pth .\Modeles_entraines\smiling\smiling.pth --attr_name Smiling --random_test 8 --seed 0 --alpha_min 2 --alpha_max 2 --n_interpolations 10
 ```
-```powershell
-python .\tests_pretrained\test_celebA_grid5.py --model_pth .\models_pre_entraines\young.pth --img_ids 182638 190012 195555 200001 202599 --alpha_min 10.0 --alpha_max 10.0 --n_interpolations 10
-```
-
 
 ---
 
-## 8. Choix des paramètres alpha
-
-| Modèle | Attribut | alpha_min | alpha_max |
-|------|---------|-----------|-----------|
-| eyeglasses.pth | Eyeglasses | 1.2 | 1.0 |
-| male.pth | Male | 2.0 | 2.0 |
-| young.pth | Young | 10.0 | 10.0 |
-| narrow_eyes.pth | Narrow Eyes | 10.0 | 10.0 |
-| pointy_nose.pth | Pointy Nose | 10.0 | 10.0 |
-
 ---
 
-## 9. Objectif final
+## 7. Résultats
 
-Les résultats générés servent de baseline qualitative pour comparer avec notre propre implémentation des Fader Networks.
-
-
-
-Toutes les commandes doivent être exécutées depuis la **racine du projet `Projet_MLA`**.
+Les résultats sont générés dans :
+```text
+results/
+```
 
 ---
-
-## Script de test utilisé
-
-### `test_celebA_grid5_trained.py`
-### `test_celebA_one_trained.py`
-### `test_external_one_trained.py`
-
-Ces scripts permetent de tester le modèle Fader Network **entraîné par notre équipe** sur un ensemble
-fixe de 5 images CelebA issues du split test.
 
  
-
-## Paramètres d’interpolation
-
-Les paramètres principaux sont :
-- `alpha_min`
-- `alpha_max`
-- `n_interpolations`
-
-Les valeurs suivantes ont été retenues pour garantir un effet visuel clair :
-
-| Attribut   | alpha_min | alpha_max |
-|------------|-----------|-----------|
-| Male       | 2.0       | 2.0       |
-| Eyeglasses | 2.0       | 2.0       |
-| Young      | 10.0      | 10.0      |
-
-Ces valeurs sont identiques à celles utilisées pour les modèles pré-entraînés,
-afin de permettre une comparaison directe.
-
----
-
-## Commandes d’exécution — Modèles entraînés (par exemple) 
-
-### Test sur 5 images CelebA (GRID5)
-
-#### Attribut **Male**
-
-```powershell
-python .\test_modeles_entraines\test_celebA_grid5_trained.py --model_pth modeles_entraines\male.pth --img_ids 202577 202583 202595 202505 202567 --alpha_min 2 --alpha_max 2 --n_interpolations 10
-
-```
-
-```powershell
-python .\test_modeles_entraines\test_celebA_grid5_trained.py --model_pth modeles_entraines\eyeglasses.pth --img_ids 202577 202583 202595 202505 202567 --alpha_min 2 --alpha_max 2 --n_interpolations 10
-
-
-```
-
-```powershell
-python .\test_modeles_entraines\test_celebA_grid5_trained.py --model_pth modeles_entraines\young.pth --img_ids 202577 202583 202595 202505 202567 --alpha_min 10 --alpha_max 10 --n_interpolations 10
-
-
-```
-
-
-
-
