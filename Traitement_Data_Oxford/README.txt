@@ -1,0 +1,5 @@
+le setid.mat c'est le fichier où y'a les indices de train, test et validation de la base de données Oxford-102. Ce fichier vient directement du site officiel. 
+C'est un .mat donc faudra passer par scipy pour le lire et récupérer les bons indices.
+Le dossier preprocess_ox c'est le code pour faire le prétraitements des attributs et le code pour tester si le fichier obtenu est correct (il l'est normalement j'ai vérifié)
+Le dossier recup_attr_ox_brut c'est là où il y a le notebook que j'ai utilisé pour récupérer les attributs couleurs des images. Il y a aussi le code (change_format_file_attribut.py) qui m'a permis de mettre le fichier des attributs dans le bon format, comme celui qu'on avait pour CelebA. Normalement y'a rien a faire dans ce dossier.
+Le dossier Data_preprocessed c'est là où pour l'instant il y a seulement le .pth des attributs
