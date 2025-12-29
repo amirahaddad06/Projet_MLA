@@ -7,10 +7,6 @@ data/*.db
 .vscode 
 Models_pre_entraines
 src 
-
- 
- 
-test_modeles_entraines
 tests_pretrained
  
 
