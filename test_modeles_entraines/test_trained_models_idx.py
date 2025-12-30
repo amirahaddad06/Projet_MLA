@@ -13,7 +13,7 @@ if PROJECT_ROOT not in sys.path:
 try:
     from .load_model import load_trained_fader
 except ImportError:
-    from .load_model import load_trained_fader
+    from load_model import load_trained_fader
 
 TFM = transforms.Compose([
     transforms.ToTensor(),
