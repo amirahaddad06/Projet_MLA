@@ -87,7 +87,7 @@ Pour les installer, exécuter depuis la racine du projet :
 
 ```bash
 pip install -r requirements.txt
-
+```
 ---
 
 ## 2. Dataset CelebA
@@ -147,7 +147,7 @@ La commande suivante doit être exécutée **depuis la racine du projet** :
 
 ```bash
 python preprocess/pretraitement_data.py
-
+```
 
 ---
 
@@ -168,7 +168,7 @@ codes_source/
 ├── Discriminator.py
 ├── loader.py
 └── entrainement/
-
+```
 
 ---
 
@@ -204,12 +204,13 @@ python -m codes_source.entrainement.train_fader \
 
 ```
 ### Sorties générées 
+```text
 modeles_entraines/
 └── <attribut>/
     ├── <attribut>.pth      # poids du modèle entraîné
     ├── checkpoints/        # sauvegardes intermédiaires    
     └── logs/               # logs d'entraînement (loss, infos)
-
+```
  
 ---
 
@@ -238,7 +239,7 @@ Dans `Modeles_entraines/<attribut>/<attribut>.pth` :
 - `Modeles_entraines\eyeglasses\eyeglasses.pth`
 - `Modeles_entraines\smiling\smiling.pth`
 - `Modeles_entraines\young\young.pth`
-
+```
 
 
 
@@ -264,13 +265,13 @@ Dans les deux cas, le script :
 
 ---
 
-## 7. Commandes — permettent de **générer des interpolations d’attributs
+## 7) Commandes — permettent de **générer des interpolations d’attributs
 
 > **Important :** vous pouvez choisir **autant d’images que vous voulez**   :  
 > - `--img_ids id1 id2 ...` (idx)  
 > - `--random_test K` (random)
 
-### 7.1 Test sur IDs précis (idx)
+### 8.1 Test sur IDs précis (idx)
 
 #### Male (3 images)
 ```powershell
@@ -287,7 +288,7 @@ python .\test_modeles_entraines\test_trained_models_idx.py --model_pth .\Modeles
 python .\test_modeles_entraines\test_trained_models_idx.py --model_pth .\Modeles_entraines\young\young.pth --attr_name Young --img_ids 202577 202583 202595 202505 202567 --alpha_min 10 --alpha_max 10 --n_interpolations 10
 ```
 
-### 7.2 Test random (K images du split test)
+### 8.2 Test random (K images du split test)
 
 #### Male (K=5) par exemple 
 ```powershell
@@ -303,7 +304,7 @@ python .\test_modeles_entraines\test_trained_models_random.py --model_pth .\Mode
 
 ---
 
-## 8. Résultats
+## 7. Résultats
 
 Les résultats sont générés dans :
 ```text
