@@ -1,0 +1,14 @@
+model=models_pre_entraines\young.pth
+attr=Young
+img_ids=[202595, 202381, 202371]
+alpha_min=10.0
+alpha_max=10.0
+n_interpolations=10
+border_color=(0, 255, 0)
+border_thickness=5
+alphas_base=-9.0,-6.888888835906982,-4.777777671813965,-2.6666667461395264,-0.5555555820465088,1.5555555820465088,3.6666667461395264,5.777777671813965,7.888888835906982,10.0
+
+per_image:
+202595,202595.jpg,true_attr=True,dir=reversed,after_alpha=-9.0
+202381,202381.jpg,true_attr=False,dir=normal,after_alpha=10.0
+202371,202371.jpg,true_attr=False,dir=normal,after_alpha=10.0

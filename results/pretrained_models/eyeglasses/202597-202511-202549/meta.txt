@@ -1,0 +1,14 @@
+model=models_pre_entraines\eyeglasses.pth
+attr=Eyeglasses
+img_ids=[202597, 202511, 202549]
+alpha_min=2.0
+alpha_max=2.0
+n_interpolations=10
+border_color=(0, 255, 0)
+border_thickness=5
+alphas_base=-1.0,-0.6666666865348816,-0.3333333432674408,0.0,0.3333333432674408,0.6666666865348816,1.0,1.3333333730697632,1.6666666269302368,2.0
+
+per_image:
+202597,202597.jpg,true_attr=True,dir=reversed,after_alpha=-1.0
+202511,202511.jpg,true_attr=False,dir=normal,after_alpha=2.0
+202549,202549.jpg,true_attr=False,dir=normal,after_alpha=2.0

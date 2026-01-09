@@ -1,0 +1,15 @@
+model=.\Modeles_entraines\eyeglasses\eyeglasses.pth
+attr=Eyeglasses
+ae.n_attr=1
+img_ids=[202577, 202549, 202597]
+alpha_min=2.0
+alpha_max=2.0
+n_interpolations=10
+border_color=(0, 255, 0)
+border_thickness=5
+alphas=-1.0,-0.6666666666666667,-0.33333333333333337,0.0,0.33333333333333326,0.6666666666666665,1.0,1.333333333333333,1.6666666666666665,2.0
+
+per_image:
+202577,202577.jpg,true_attr=False
+202549,202549.jpg,true_attr=False
+202597,202597.jpg,true_attr=True

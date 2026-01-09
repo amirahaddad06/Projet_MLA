@@ -1,0 +1,15 @@
+model=.\Modeles_entraines\young\young.pth
+attr=Young
+ae.n_attr=1
+img_ids=[202577, 202547, 202243]
+alpha_min=8.0
+alpha_max=8.0
+n_interpolations=10
+border_color=(0, 255, 0)
+border_thickness=5
+alphas=-7.0,-5.333333333333333,-3.6666666666666665,-2.0,-0.33333333333333304,1.333333333333334,3.0,4.666666666666668,6.333333333333334,8.0
+
+per_image:
+202577,202577.jpg,true_attr=True
+202547,202547.jpg,true_attr=False
+202243,202243.jpg,true_attr=False
