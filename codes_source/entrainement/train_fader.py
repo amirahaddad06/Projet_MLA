@@ -40,13 +40,13 @@ from .viz import save_monitor_grid
 def main():
     ap = argparse.ArgumentParser()
 
-    # --- Data / paths ---
+    #  Data / paths 
     ap.add_argument("--root_dir", type=str, default=".", help="Doit contenir Data_preprocessed/ .")
     ap.add_argument("--attr", type=str, required=True, help='Attribut à entraîner: "Male", "Young", ...')
     ap.add_argument("--out_dir", type=str, default="modeles_entraines", help="Dossier de sorties training")
     ap.add_argument("--num_workers", type=int, default=4)
 
-    # --- Training hyperparams ---
+    # Training hyperparams 
     ap.add_argument("--batch_size", type=int, default=32)
     ap.add_argument("--lr", type=float, default=2e-4)
     ap.add_argument("--betas", type=float, nargs=2, default=(0.5, 0.999))
@@ -54,12 +54,12 @@ def main():
     ap.add_argument("--epoch_size", type=int, default=50000, help="Nb d'images vues par epoch (approx)")
     ap.add_argument("--clip_grad", type=float, default=5.0)
 
-    # --- Fader specific ---
+    #  Fader specific 
     ap.add_argument("--lambda_lat", type=float, default=1e-4)
     ap.add_argument("--lambda_warmup", type=int, default=500000)  # en steps (batches)
     ap.add_argument("--n_dis_steps", type=int, default=1)
 
-    # --- Monitoring / save ---
+    # Monitoring / save 
     ap.add_argument("--log_every", type=int, default=200)
     ap.add_argument("--save_every", type=int, default=2000)  # en steps (batches)
     ap.add_argument("--ckpt_every", type=int, default=5000)  # en steps (batches)
@@ -68,7 +68,7 @@ def main():
     args = ap.parse_args()
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    # --- Data ---
+    # Data 
     train_loader, valid_loader, _ = get_dataloaders(
         root_dir=args.root_dir,
         batch_size=args.batch_size,
@@ -81,7 +81,7 @@ def main():
         raise ValueError(f"Attribut {args.attr} absent. Dispo: {attr_names}")
     attr_idx = attr_names.index(args.attr)
 
-    # --- Run paths ---
+    #  Run paths 
     run_name = f"{args.attr}_256"
     paths = make_run_paths(args.out_dir, run_name)
 
@@ -92,16 +92,16 @@ def main():
     with open(log_file, "a", encoding="utf-8") as f:
         f.write(f"RUN={run_name} device={device} attr_idx={attr_idx} batch={args.batch_size}\n")
 
-    # --- Models (mono-attribut => n_attr=1) ---
+    # Models (mono-attribut => n_attr=1) 
     encoder = Encoder().to(device)
     decoder = Decoder(n_attr=1).to(device)
     discriminator = Discriminator(n_attr=1, dropout=0.3).to(device)
 
 
-    # --- Losses ---
+    # Losses 
     losses = FaderLosses()
 
-    # --- Optimizers ---
+    # Optimizers 
     opt_ae = Adam(
         list(encoder.parameters()) + list(decoder.parameters()),
         lr=args.lr,
@@ -113,7 +113,7 @@ def main():
         betas=tuple(args.betas),
     )
 
-    # --- TensorBoard ---
+    # TensorBoard 
     writer = None
     if args.tensorboard:
         if not TENSORBOARD_OK:
@@ -121,7 +121,7 @@ def main():
         else:
             writer = SummaryWriter(log_dir=str(paths.logs))
 
-    # --- Fixed batch pour monitoring (recon + swap) ---
+    # Fixed batch pour monitoring (recon + swap) 
     fixed_x, fixed_attrs = next(iter(valid_loader))
     fixed_x = fixed_x.to(device)
     fixed_y = (fixed_attrs[:, attr_idx] > 0).float().unsqueeze(1).to(device)
@@ -134,9 +134,9 @@ def main():
     next_save = args.save_every
     next_ckpt = args.ckpt_every
 
-    # -----------------------------
+    
     # Training loop
-    # -----------------------------
+   
     for epoch in range(args.epochs):
         t0 = time.time()
 
@@ -246,9 +246,9 @@ def main():
         if writer is not None:
             writer.add_scalar("val/rec", val_rec, epoch)
 
-        # -----------------------------
+        
         # Save best + export final
-        # -----------------------------
+       
         if val_rec < best_val_rec:
             best_val_rec = val_rec
 

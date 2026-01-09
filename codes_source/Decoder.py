@@ -51,10 +51,7 @@ class Decoder(nn.Module):
         )
 
     def forward(self, z, y):
-        """
-        z : [B, 512, 2, 2]
-        y : [B, n_attr]
-        """
+    
         B, C, H, W = z.shape
 
         # étaler y sur HxW pour concaténer avec z

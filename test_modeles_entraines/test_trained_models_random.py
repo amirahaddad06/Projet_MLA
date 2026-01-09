@@ -21,10 +21,10 @@ TFM = transforms.Compose([
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
 ])
 
-# split CelebA (comme ton loader)
+
 TRAIN_SIZE = 162770
 VALID_SIZE = 19867
-TEST_START_0IDX = TRAIN_SIZE + VALID_SIZE  # 0-based
+TEST_START_0IDX = TRAIN_SIZE + VALID_SIZE  
 
 
 def resolve_fname(img_dir: str, img_id: int) -> str:
@@ -134,7 +134,7 @@ def main():
     print("Random TEST img_ids:", img_ids_sorted)
 
    
-    # results/trained_models/random_test_images/male/ids_202524-202576-202595/
+    
     out_dir = os.path.join(
         "results",
         "trained_models",

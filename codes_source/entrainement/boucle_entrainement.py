@@ -111,7 +111,7 @@ def train_one_step(
     x_hat = decoder(z, y)
     loss_rec = losses.recon_loss(x_hat, x)
 
-    logits_adv = discriminator(z)  # attention: sans detach => gradients vers l'encodeur
+    logits_adv = discriminator(z)  
     loss_adv = losses.adv_loss(logits_adv, y)
 
     lam = lambda_schedule(step=step, lambda_max=lambda_lat, warmup_steps=lambda_warmup)
